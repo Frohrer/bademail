@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const encrypt = require('mongoose-encryption');
 const DB = mongoose.createConnection(process.env.MONGO_ADMIN_URL)
+const { logger } = require('./logger.js')
 const emailSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -53,9 +54,9 @@ const updateOrCreateVisitor = async (email) => {
       
       const visitor = await VisitorEmail.findOneAndUpdate(filter, update, options);
   
-      console.log('Visitor updated or inserted:', visitor);
+      logger.info('Visitor updated or inserted:', visitor);
     } catch(err) {
-      console.error('Error updating or inserting visitor:', err);
+      logger.error('Error updating or inserting visitor:', err);
     }
 }
 
@@ -64,23 +65,23 @@ const insertEmail = async (emailData) => {
 
   return email.save()
   .then(email => {
-      console.log('Email inserted successfully!');
+      logger.info('Email inserted successfully!');
       return email._id;  // return the id of the inserted document
   })
-  .catch(err => console.error('Error inserting email: ', err));
+  .catch(err => logger.error('Error inserting email: ', err));
 }
 
 const updateEmail = async (id, emailData) => {
   return EmailStore.findByIdAndUpdate(id, emailData, {new: true})
   .then(email => {
       if(!email) {
-          console.log('No email found with this id');
+          logger.info('No email found with this id');
           return;
       }
-      console.log('Email updated successfully!');
+      logger.info('Email updated successfully!');
       return email;  // return the updated document
   })
-  .catch(err => console.error('Error updating email: ', err));
+  .catch(err => logger.error('Error updating email: ', err));
 }
 
 module.exports = {

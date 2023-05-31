@@ -265,17 +265,16 @@ const smtpServerNodemailer = new SMTPServer({
 	}
 });
 
-if (process.env.mode === 'cicd') {
+if (process.env.MODE === 'cicd') {
     let emailData = {
         email:'test@example.com',
         messageId:'test123-fakeid@example.com',
-        header:mail.headers,
+        header:{},
         body:`---------- Forwarded message ---------
         From: Micheal Bloomberg <mbloomberg@example.com>
         Date: Fri, May 26, 2023 at 8:54 AM
         Subject: HI $10,000,000.00 DONATION FOR YOU!
         To:
-        
         
         -- 
         Hi, my name is Michael Bloomberg; a philanthropist and founder of
@@ -300,9 +299,9 @@ if (process.env.mode === 'cicd') {
         handle_message(emailData.body, settings).then((response) => {
             emailData.verdict = response
             updateEmail(id,emailData)
-            sendEmail(response,info,mail,settings)
+            process.exit(1);
         })
-        exit()
+        
     })
 }
 

@@ -7,7 +7,7 @@ const { JSDOM } = require('jsdom');
 const { createWorker } = require('tesseract.js');
 const { followLink, followLinks } = require('./funx.js')
 const { processMaxTokens, processEmail} = require('./gpt-helper.js')
-
+const { logger } = require('./logger.js')
 
 async function remove_before_forwarded(text) {
     // Find the index of the "Begin forwarded message:" string
@@ -109,7 +109,7 @@ async function ocr_html_images(html, output_directory) {
         try {
             let response = await axios.get(image_url, { responseType: 'arraybuffer' });
             if (response.status !== 200) {
-                console.log(`Error downloading image at ${image_url}: status code ${response.status}`);
+                logger.error(`Error downloading image at ${image_url}: status code ${response.status}`);
                 continue;
             }
             // Save the image to a file
@@ -122,14 +122,14 @@ async function ocr_html_images(html, output_directory) {
             ocr_text+=data.text+'\n'
             fs.unlinkSync(image_path)
         } catch (error) {
-          console.log(error)
+          logger.error(error)
             continue;
         }
     }
     await worker.terminate();
     return ocr_text;
   } catch (error) {
-    console.log(error)
+    logger.error(error)
     return ''
   }
 }
@@ -140,7 +140,6 @@ async function extract_text_from_html(html) {
 
     // Replace <br> tags with newline characters
     $('br').replaceWith('\n');
-    // console.log($.text())
     // Replace <p> tags with double newline characters
     $('p').each(function() {
         let $p = $(this);
@@ -155,7 +154,6 @@ async function extract_text_from_html(html) {
         let text = $p.text();
         $p.html('\n\n' + text + '\n\n');
     });
-    // console.log($.text())
     // Extract all the text from the modified HTML document
     let text = $.text();
 
@@ -264,7 +262,7 @@ function censor_url(url, ic_threshold) {
 
   return url;
   } catch (error) {
-    console.log(error)
+    logger.error(error)
     return url
   }
   
@@ -317,10 +315,9 @@ async function bingWebSearch(query, retries = 3) {
         headers: { 'Ocp-Apim-Subscription-Key': process.env.AZURE_SUBSCRIPTION_KEY },
       }
     );
-    console.log(response.status)
     if (response.status == 429) {
       if (retries > 0) {
-        console.log('Rate limit exceeded. Retrying in 1 second...');
+        logger.error('Rate limit exceeded. Retrying in 1 second...');
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return retry();
       } else {
@@ -329,7 +326,6 @@ async function bingWebSearch(query, retries = 3) {
     }
 
     const body = response.data;
-    // console.log(body.webPages.value)
     if (body.webPages && body.webPages.value) {
       let pages = body.webPages.value;
       let all_pages = [];
@@ -339,11 +335,10 @@ async function bingWebSearch(query, retries = 3) {
       }
       return JSON.stringify(all_pages);
     } else {
-      console.log("No webPages value found");
       return JSON.stringify([]);
     }
   } catch (error) {
-    console.log('Error:', error.message);
+    logger.error('Error:', error.message);
     throw error;
   }
 }

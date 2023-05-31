@@ -2,7 +2,7 @@ const { good_response, error_response } = require('./email_templates.js');
 const nodemailer = require('nodemailer')
 const crypto = require('crypto');
 const { loadSettings } = require('./settings/settings.js')
-
+const { logger } = require('./logger.js')
 const settings = loadSettings()
 
 const directTransporter = nodemailer.createTransport({
@@ -20,10 +20,10 @@ const directTransporter = nodemailer.createTransport({
 });
 directTransporter.verify(function(error, success) {
     if (error) {
-        console.log('directTransporter',error);
+        logger.error('directTransporter',error);
     } else {
-        console.log(success);
-        console.log("Server is ready to take our messages");
+        logger.info(success);
+        logger.info("Server is ready to take our messages");
     }
 });
 const sendEmail = function(response,info,mail){
@@ -43,13 +43,13 @@ const sendEmail = function(response,info,mail){
   try {
       directTransporter.sendMail(mailOptions, function(error, info){
           if (error) {
-              console.log(error);
+              logger.error(error);
           } else {
-              console.log('Email sent: ' + info.response + ' ' + clientEmail);
+              logger.info('Email sent: ' + info.response + ' ' + clientEmail);
           }
       });
   } catch (e) {
-      console.log(e);
+      logger.error(e);
   }
 }
 const sendErrorEmail = function(info){
@@ -69,13 +69,13 @@ const sendErrorEmail = function(info){
   try {
       directTransporter.sendMail(mailOptions, function(error, info){
           if (error) {
-              console.log(error);
+              logger.error(error);
           } else {
-              console.log('Email sent: ' + info.response + ' ' + clientEmail);
+              logger.info('Email sent: ' + info.response + ' ' + clientEmail);
           }
       });
   } catch (e) {
-      console.log(e);
+      logger.error(e);
   }
 }
 
@@ -97,13 +97,13 @@ const forwardEmail = function(info,mail){
   try {
       directTransporter.sendMail(mailOptions, function(error, info){
           if (error) {
-              console.log(error);
+              logger.error(error);
           } else {
-              console.log('Email sent: ' + info.response + ' ' + clientEmail);
+              logger.info('Email sent: ' + info.response + ' ' + clientEmail);
           }
       });
   } catch (e) {
-      console.log(e);
+      logger.error(e);
   }
 }
 

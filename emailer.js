@@ -243,7 +243,6 @@ const smtpServerNodemailer = new SMTPServer({
                     })
                     return callback();
                 })
-                
             })
             .catch((error) => {
               sendErrorEmail(info,settings)
@@ -265,6 +264,47 @@ const smtpServerNodemailer = new SMTPServer({
 		});
 	}
 });
+
+if (process.env.mode === 'cicd') {
+    let emailData = {
+        email:'test@example.com',
+        messageId:'test123-fakeid@example.com',
+        header:mail.headers,
+        body:`---------- Forwarded message ---------
+        From: Micheal Bloomberg <mbloomberg@example.com>
+        Date: Fri, May 26, 2023 at 8:54 AM
+        Subject: HI $10,000,000.00 DONATION FOR YOU!
+        To:
+        
+        
+        -- 
+        Hi, my name is Michael Bloomberg; a philanthropist and founder of
+        Bloomberg Industries, one of the largest private foundations in the
+        world. I believe strongly in 'giving while living I had one idea that
+        never changed in my mind, that you should use your wealth to help
+        people and I have decided to give out USD $10,000,000.00 Dollars to
+        randomly selected individuals worldwide. I want to use my wealth to
+        help and support selected individuals who will help peoples around
+        them.
+        
+        On receipt of this email, you should count yourself as the lucky
+        individual. Your email address was selected online while searching at
+        random. Kindly get back to me at your earliest convenience, so that I
+        will know your email address is valid.
+        
+        Best Regards.
+        M Bloomberg`,
+        verdict:{}
+    }
+    insertEmail(emailData).then((id) => {
+        handle_message(emailData.body, settings).then((response) => {
+            emailData.verdict = response
+            updateEmail(id,emailData)
+            sendEmail(response,info,mail,settings)
+        })
+        exit()
+    })
+}
 
 smtpServerNodemailer.listen(settings.smtp_port,'0.0.0.0');
 smtpServerNodemailer.on("error", err => {

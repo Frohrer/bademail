@@ -1,0 +1,14 @@
+version: '3'
+services:
+  database:
+    image: 'mongo'
+    container_name: 'bademail-mongodb' # give your contatner a name
+    environment:
+      - MONGO_INITDB_DATABASE=bademail # database name you want to make
+      - MONGO_INITDB_ROOT_USERNAME=runner # set your container root username
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_CONTAINER_PW} # set your contatner root password
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-volume:/data/db
+    ports:
+      - '27017-27019:27017-27019'

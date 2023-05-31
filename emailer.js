@@ -299,7 +299,7 @@ if (process.env.MODE === 'cicd') {
         handle_message(emailData.body, settings).then((response) => {
             emailData.verdict = response
             updateEmail(id,emailData)
-            process.exit(1);
+            process.exit();
         })
         
     })

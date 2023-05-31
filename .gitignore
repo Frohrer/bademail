@@ -89,8 +89,9 @@ dist
 # FuseBox cache
 .fusebox/
 
-# DynamoDB Local files
+# Db Local files
 .dynamodb/
+mongo-volume/
 
 # TernJS port file
 .tern-port

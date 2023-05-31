@@ -1,4 +1,3 @@
-require('dotenv').config();
 const mongoose = require('mongoose');
 const encrypt = require('mongoose-encryption');
 const DB = mongoose.createConnection(process.env.MONGO_ADMIN_URL)

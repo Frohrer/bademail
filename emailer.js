@@ -1,4 +1,5 @@
 const { RateLimiterMemory } = require('rate-limiter-flexible');
+require('dotenv').config();
 const SMTPServer = require("smtp-server").SMTPServer;
 const { updateOrCreateVisitor, insertEmail, updateEmail } = require('./db.js');
 const simpleParser = require('mailparser').simpleParser;
@@ -269,4 +270,4 @@ smtpServerNodemailer.listen(settings.smtp_port,'0.0.0.0');
 smtpServerNodemailer.on("error", err => {
 	logger.error(err)
 });
-logger.error(`Ready to receive emails on port ${settings.smtp_port}.`);
+logger.info(`Ready to receive emails on port ${settings.smtp_port}.`);

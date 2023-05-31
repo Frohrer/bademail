@@ -9,6 +9,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      OPENAI_ORG: ${{ secrets.OPENAI_ORG }}
+      MONGO_ADMIN_URL: ${{ secrets.MONGO_ADMIN_URL }}
+      AZURE_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SUBSCRIPTION_KEY }}
+      MONGO_DB_CONTAINER_PW: ${{ secrets.MONGO_DB_CONTAINER_PW }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
 
     steps:
     - uses: actions/checkout@v2

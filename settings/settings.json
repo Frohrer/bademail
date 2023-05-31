@@ -1,0 +1,15 @@
+{
+    "domain":"bademail.io",
+    "smtp_port":25,
+    "limit_string":"3 emails per 12 hours.",
+    "limit_points":3,
+    "limit_duration":43200,
+    "follow_links":true,
+    "ocr":false,
+    "reply_email":"",
+    "smtp_credentials":{
+        "domain":"smtp.sendgrid.net",
+        "user":"apikey",
+        "port":465
+    }
+}

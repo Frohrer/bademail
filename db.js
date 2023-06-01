@@ -76,7 +76,7 @@ const updateEmail = async (id, emailData) => {
   return EmailStore.findByIdAndUpdate(id, emailData, {new: true})
   .then(email => {
       if(!email) {
-          logger.info('No email found with this id');
+          logger.info('No email found with this id.');
           return;
       }
       logger.info('Email updated successfully!');
@@ -89,7 +89,7 @@ const getFailedEmails = async () => {
   return EmailStore.find({processed: false})
   .then(emails => {
       if(emails.length === 0) {
-          logger.info('No email found with this id');
+          logger.info('No unprocessed emails found.');
           return [];
       }
       logger.info(`Found ${emails.length} previously unprocessed emails.`);

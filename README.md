@@ -1,7 +1,9 @@
 # Bademail.io
 
-[![Latest Build](https://github.com/Frohrer/bademail/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Frohrer/bademail/actions/workflows/test.yml)
-[![Security](https://github.com/Frohrer/bademail/actions/workflows/security.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/security.yml)
+[![CI Main](https://github.com/Frohrer/bademail/actions/workflows/main-build.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/main-build.yml)
+[![Dependency Review](https://github.com/Frohrer/bademail/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/dependency-review.yml)
+[![SAST](https://github.com/Frohrer/bademail/actions/workflows/sast.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/sast.yml)
+[![CI Beta](https://github.com/Frohrer/bademail/actions/workflows/beta-build.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/beta-build.yml)
 
 Bademail.io is a bot designed to analyze emails for phishing attempts and provide recommendations. It's a tool that helps users identify suspicious emails and understand the potential risks associated with them.
 

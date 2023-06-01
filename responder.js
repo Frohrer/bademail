@@ -26,7 +26,7 @@ directTransporter.verify(function(error, success) {
         logger.info("Server is ready to take our messages");
     }
 });
-const sendEmail = function(response,info,mail){
+const sendEmail = function(response,info){
   let mailOptions = {
       from: `Bademail Bot <bot@${settings.domain}>`,
       replyTo: `Reply <reply@${settings.domain}>`,

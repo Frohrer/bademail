@@ -1,0 +1,41 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ beta ]
+  pull_request:
+    branches: [ beta ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      OPENAI_ORG: ${{ secrets.OPENAI_ORG }}
+      MONGO_ADMIN_URL: ${{ secrets.MONGO_ADMIN_URL }}
+      AZURE_SUBSCRIPTION_KEY: ${{ secrets.AZURE_SUBSCRIPTION_KEY }}
+      MONGO_DB_CONTAINER_PW: ${{ secrets.MONGO_DB_CONTAINER_PW }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 'Create env file'
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Docker Compose
+      run: |
+        sudo apt-get update && sudo apt-get install -y docker-compose
+        docker-compose -f ./docker-compose.yml up -d
+
+    - name: Start the application
+      run: npm start

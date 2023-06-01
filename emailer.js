@@ -314,7 +314,7 @@ getFailedEmails().then((emails) => {
         let email = emails[i];
         handle_message(email.body, settings).then((response) => {
             email.verdict = response
-            emailData.processed = true
+            email.processed = true
             updateEmail(id,email)
             process.exit();
         })

@@ -231,7 +231,7 @@ const smtpServerNodemailer = new SMTPServer({
                 let emailData = {
                     email:info.from,
                     messageId:info.messageId,
-                    header:mail.headers,
+                    headers:mail.headers,
                     body:mail.html || mail.text,
                     verdict:{},
                     processed:false,
@@ -241,7 +241,7 @@ const smtpServerNodemailer = new SMTPServer({
                         emailData.verdict = response
                         emailData.processed = true
                         updateEmail(id,emailData)
-                        sendEmail(response,info,mail,settings)
+                        sendEmail(response,info,mail)
                     })
                     return callback();
                 })
@@ -271,7 +271,7 @@ if (process.env.MODE === 'cicd') {
     let emailData = {
         email:'test@example.com',
         messageId:'test123-fakeid@example.com',
-        header:{},
+        headers:{},
         body:`---------- Forwarded message ---------
         From: Micheal Bloomberg <mbloomberg@example.com>
         Date: Fri, May 26, 2023 at 8:54 AM
@@ -316,6 +316,12 @@ getFailedEmails().then((emails) => {
             email.verdict = response
             email.processed = true
             updateEmail(email._id,email)
+            let info = {
+                messageId:email.messageId,
+                from:email.email,
+                subject:email.headers.subject
+            }
+            sendEmail(response,info)
         })
     }
 })

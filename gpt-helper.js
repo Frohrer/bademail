@@ -1,7 +1,7 @@
 const { Tiktoken } = require("tiktoken/lite");
 const cl100k_base = require("tiktoken/encoders/cl100k_base.json");
 const { Configuration, OpenAIApi } = require('openai');
-
+const { logger } = require('./logger.js')
 
 const configuration = new Configuration({
 	organization: process.env.OPENAI_ORG,

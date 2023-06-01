@@ -1,6 +1,7 @@
 # Bademail.io
 
-[![Node.js CI](https://github.com/Frohrer/bademail/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Frohrer/bademail/actions/workflows/test.yml)
+[![Latest Build](https://github.com/Frohrer/bademail/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Frohrer/bademail/actions/workflows/test.yml)
+[![Security](https://github.com/Frohrer/bademail/actions/workflows/security.yml/badge.svg)](https://github.com/Frohrer/bademail/actions/workflows/security.yml)
 
 Bademail.io is a bot designed to analyze emails for phishing attempts and provide recommendations. It's a tool that helps users identify suspicious emails and understand the potential risks associated with them.
 

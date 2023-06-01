@@ -5,7 +5,7 @@ const cheerio = require('cheerio');
 const parseUrl = require('parse-url');
 const { JSDOM } = require('jsdom');
 const { createWorker } = require('tesseract.js');
-const { followLink, followLinks } = require('./funx.js')
+const { followLink, followLinks } = require('./http-helper.js')
 const { processMaxTokens, processEmail} = require('./gpt-helper.js')
 const { logger } = require('./logger.js')
 

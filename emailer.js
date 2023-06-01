@@ -1,7 +1,7 @@
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 require('dotenv').config();
 const SMTPServer = require("smtp-server").SMTPServer;
-const { updateOrCreateVisitor, insertEmail, updateEmail } = require('./db.js');
+const { updateOrCreateVisitor, insertEmail, updateEmail, getFailedEmails } = require('./db.js');
 const simpleParser = require('mailparser').simpleParser;
 const { sendEmail, sendErrorEmail, forwardEmail } = require('./responder.js');
 const { handle_message } = require('./analysis.js')
@@ -233,11 +233,13 @@ const smtpServerNodemailer = new SMTPServer({
                     messageId:info.messageId,
                     header:mail.headers,
                     body:mail.html || mail.text,
-                    verdict:{}
+                    verdict:{},
+                    processed:false,
                 }
                 insertEmail(emailData).then((id) => {
                     handle_message(mail.html || mail.text, settings).then((response) => {
                         emailData.verdict = response
+                        emailData.processed = true
                         updateEmail(id,emailData)
                         sendEmail(response,info,mail,settings)
                     })
@@ -293,17 +295,31 @@ if (process.env.MODE === 'cicd') {
         
         Best Regards.
         M Bloomberg`,
-        verdict:{}
+        verdict:{},
+        processed:false,
     }
     insertEmail(emailData).then((id) => {
         handle_message(emailData.body, settings).then((response) => {
             emailData.verdict = response
+            emailData.processed = true
             updateEmail(id,emailData)
             process.exit();
         })
         
     })
 }
+
+getFailedEmails().then((emails) => {
+    for (let i = 0; i < emails.length; i++) {
+        let email = emails[i];
+        handle_message(email.body, settings).then((response) => {
+            email.verdict = response
+            emailData.processed = true
+            updateEmail(id,email)
+            process.exit();
+        })
+    }
+})
 
 smtpServerNodemailer.listen(settings.smtp_port,'0.0.0.0');
 smtpServerNodemailer.on("error", err => {

@@ -13,6 +13,7 @@ const emailSchema = new mongoose.Schema({
     header: Object,
     body: String,
     verdict: Object,
+    processed: Boolean,
 },{ timestamps: true })
 
 const visitorEmailSchema = new mongoose.Schema({
@@ -84,8 +85,22 @@ const updateEmail = async (id, emailData) => {
   .catch(err => logger.error('Error updating email: ', err));
 }
 
+const getFailedEmails = async () => {
+  return EmailStore.find({processed: false})
+  .then(emails => {
+      if(emails.length === 0) {
+          logger.info('No email found with this id');
+          return [];
+      }
+      logger.info(`Found ${emails.length} previously unprocessed emails.`);
+      return emails;
+  })
+  .catch(err => logger.error('Error finding unprocessed emails: ', err));
+}
+
 module.exports = {
     updateOrCreateVisitor,
     insertEmail,
-    updateEmail
+    updateEmail,
+    getFailedEmails
 }

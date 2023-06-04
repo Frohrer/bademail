@@ -17,7 +17,7 @@ function loadSettings() {
             const data = fs.readFileSync(settingsPath, 'utf8');
 
             // Parse the JSON data
-            settings = JSON.parse(data);
+            settings = {...JSON.parse(data)}
         }
 
         // Check if allowlist file exists

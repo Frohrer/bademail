@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const encrypt = require('mongoose-encryption');
 const DB = mongoose.createConnection(process.env.MONGO_ADMIN_URL)
 const { logger } = require('./logger.js')
+
+// Define your encryption key and your signing key
+const encKey = process.env.MONGO_ENCRYPTION_KEY;
+const sigKey = process.env.MONGO_SIGNING_KEY;
+
 const emailSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -15,6 +20,9 @@ const emailSchema = new mongoose.Schema({
     verdict: Object,
     processed: Boolean,
 },{ timestamps: true })
+
+// Add mongoose-encryption plugin to your schema
+emailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey });
 
 const visitorEmailSchema = new mongoose.Schema({
   email: {
@@ -36,6 +44,9 @@ const visitorEmailSchema = new mongoose.Schema({
     default: Date.now,
   },
 }, { timestamps: true });
+
+// Add mongoose-encryption plugin to your schema
+visitorEmailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey });
 
 const VisitorEmail = DB.model('VisitorEmail', visitorEmailSchema);
 const EmailStore = DB.model('bademail_verdicts', emailSchema, 'bademail_verdicts');
@@ -85,6 +96,19 @@ const updateEmail = async (id, emailData) => {
   .catch(err => logger.error('Error updating email: ', err));
 }
 
+const deleteEmail = async (id) => {
+  return EmailStore.findByIdAndRemove(id)
+  .then(email => {
+      if(!email) {
+          logger.info('No email found with this id.');
+          return;
+      }
+      logger.info('Email deleted successfully!');
+      return email;  // return the deleted document
+  })
+  .catch(err => logger.error('Error deleting email: ', err));
+}
+
 const getFailedEmails = async () => {
   return EmailStore.find({processed: false})
   .then(emails => {
@@ -102,5 +126,6 @@ module.exports = {
     updateOrCreateVisitor,
     insertEmail,
     updateEmail,
-    getFailedEmails
+    getFailedEmails,
+    deleteEmail
 }

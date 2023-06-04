@@ -1,7 +1,7 @@
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 require('dotenv').config();
 const SMTPServer = require("smtp-server").SMTPServer;
-const { updateOrCreateVisitor, insertEmail, updateEmail, getFailedEmails } = require('./db.js');
+const { updateOrCreateVisitor, insertEmail, updateEmail, getFailedEmails, deleteEmail } = require('./db.js');
 const simpleParser = require('mailparser').simpleParser;
 const { sendEmail, sendErrorEmail, forwardEmail } = require('./responder.js');
 const { handle_message } = require('./analysis.js')
@@ -242,6 +242,7 @@ const smtpServerNodemailer = new SMTPServer({
                         emailData.processed = true
                         updateEmail(id,emailData)
                         sendEmail(response,info,mail)
+                        deleteEmail(id)
                     })
                     return callback();
                 })
@@ -322,6 +323,7 @@ getFailedEmails().then((emails) => {
                 subject:email.headers.subject
             }
             sendEmail(response,info)
+            deleteEmail(email._id)
         })
     }
 })

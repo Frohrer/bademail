@@ -52,24 +52,30 @@ const VisitorEmail = DB.model('VisitorEmail', visitorEmailSchema);
 const EmailStore = DB.model('bademail_verdicts', emailSchema, 'bademail_verdicts');
 
 const updateOrCreateVisitor = async (email) => {
-    try {
-      const filter = { email: email };
-      const update = { 
-        $inc: { visitCount: 1 },
-        $set: { lastVisit: new Date() },
-      };
-      const options = { 
-        new: true,
-        upsert: true, // Make this update into an upsert
-        setDefaultsOnInsert: true, // Apply schema defaults if new document is inserted
-      };
-      
-      const visitor = await VisitorEmail.findOneAndUpdate(filter, update, options);
-  
+  try {
+      const visitor = await VisitorEmail.findOne({ email: email });
+
+      if (visitor) {
+          // If the visitor exists, update the visitCount and lastVisit fields
+          visitor.visitCount += 1;
+          visitor.lastVisit = new Date();
+      } else {
+          // If the visitor does not exist, create a new document
+          visitor = new VisitorEmail({
+              email: email,
+              visitCount: 1,
+              firstVisit: new Date(),
+              lastVisit: new Date(),
+          });
+      }
+
+      // Save the changes
+      await visitor.save();
+
       logger.info('Visitor updated or inserted:', visitor);
-    } catch(err) {
+  } catch(err) {
       logger.error('Error updating or inserting visitor:', err);
-    }
+  }
 }
 
 const insertEmail = async (emailData) => {

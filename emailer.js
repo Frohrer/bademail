@@ -34,7 +34,6 @@ function processRequest(email) {
     });
 }
 
-
 function infoParser(envelope,data){
     return new Promise((resolve,reject) => {
         let info = {

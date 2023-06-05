@@ -22,10 +22,10 @@ Bademail.io is currently in testing phase and is not 100% accurate. Always confi
 
 ### Requirements
 
-NodeJS v16 or higher
-OpenAI GPT-4 API access
-Bing API key
-SMTP service (Sendgrid, Mailgun)
+NodeJS v16 or higher  
+OpenAI GPT-4 API access  
+Bing API key  
+SMTP service (Sendgrid, Mailgun)  
 
 ### Install
 

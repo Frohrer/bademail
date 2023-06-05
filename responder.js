@@ -27,30 +27,30 @@ directTransporter.verify(function(error, success) {
     }
 });
 const sendEmail = function(response,info){
-  let mailOptions = {
-      from: `Bademail Bot <bot@${settings.domain}>`,
-      replyTo: `Reply <reply@${settings.domain}>`,
-      references: info.messageId,
-      messageId: `${crypto.randomBytes(16).toString("hex")}@tx.${settings.domain}`,
-      to: info.from,
-      subject: `Response from Bademail Bot: ${info.subject}`,
-      text: `Bademail Bot Response: ${response}`,
-      html: good_response(response),
-      headers:{
-          'X-BADEMAIL-CHECKED':'true'
-      }
-  };
-  try {
-      directTransporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-              logger.error(error);
-          } else {
-              logger.info('Email sent: ' + info.response + ' ' + clientEmail);
-          }
-      });
-  } catch (e) {
-      logger.error(e);
-  }
+    let mailOptions = {
+        from: `Bademail Bot <bot@${settings.domain}>`,
+        replyTo: `Reply <reply@${settings.domain}>`,
+        references: info.messageId,
+        messageId: `${crypto.randomBytes(16).toString("hex")}@tx.${settings.domain}`,
+        to: info.from,
+        subject: `Response from Bademail Bot: ${info.subject}`,
+        text: `Bademail Bot Response: ${response}`,
+        html: good_response(response),
+        headers:{
+            'X-BADEMAIL-CHECKED':'true'
+        }
+    };
+    try {
+        directTransporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                logger.error(error);
+            } else {
+                logger.info('Email sent: ' + info.response + ' ' + clientEmail);
+            }
+        });
+    } catch (e) {
+        logger.error(e);
+    }
 }
 const sendErrorEmail = function(info){
   let mailOptions = {

@@ -53,7 +53,7 @@ const EmailStore = DB.model('bademail_verdicts', emailSchema, 'bademail_verdicts
 
 const updateOrCreateVisitor = async (email) => {
   try {
-      const visitor = await VisitorEmail.findOne({ email: email });
+      let visitor = await VisitorEmail.findOne({ email: email });
 
       if (visitor) {
           // If the visitor exists, update the visitCount and lastVisit fields

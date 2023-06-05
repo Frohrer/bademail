@@ -132,7 +132,6 @@ function infoParser(envelope,data){
         if (data.spf && data.spf == 'pass') {
             info.valid_spf = true
         }
-        logger.info(info)
         resolve(info)
     })
 }

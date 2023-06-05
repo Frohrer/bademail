@@ -22,7 +22,6 @@ directTransporter.verify(function(error, success) {
     if (error) {
         logger.error('directTransporter',error);
     } else {
-        logger.info(success);
         logger.info("Server is ready to take our messages");
     }
 });

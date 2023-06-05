@@ -15,6 +15,7 @@ const emailSchema = new mongoose.Schema({
         lowercase: true,
     },
     messageId: String,
+    subject: String,
     header: Object,
     body: String,
     verdict: Object,
@@ -22,7 +23,7 @@ const emailSchema = new mongoose.Schema({
 },{ timestamps: true })
 
 // Add mongoose-encryption plugin to your schema
-emailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey });
+emailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey, excludeFromEncryption: ['processed'] });
 
 const visitorEmailSchema = new mongoose.Schema({
   email: {
@@ -116,7 +117,7 @@ const deleteEmail = async (id) => {
 }
 
 const getFailedEmails = async () => {
-  return EmailStore.find({processed: false})
+  return EmailStore.find({'processed': false})
   .then(emails => {
       if(emails.length === 0) {
           logger.info('No unprocessed emails found.');
@@ -128,10 +129,19 @@ const getFailedEmails = async () => {
   .catch(err => logger.error('Error finding unprocessed emails: ', err));
 }
 
+const getAllEmails = async () => {
+  return EmailStore.find({})
+  .then(emails => {
+      return emails;
+  })
+  .catch(err => logger.error('Error finding emails: ', err));
+}
+
 module.exports = {
     updateOrCreateVisitor,
     insertEmail,
     updateEmail,
     getFailedEmails,
-    deleteEmail
+    deleteEmail,
+    getAllEmails
 }

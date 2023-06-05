@@ -4,7 +4,9 @@
     "limit_string":"3 emails per 12 hours.",
     "limit_points":3,
     "limit_duration":43200,
-    "follow_links":true,
+    "follow_links":false,
+    "search_links":true,
+    "link_analysis_limit":8,
     "ocr":false,
     "reply_email":"",
     "smtp_credentials":{

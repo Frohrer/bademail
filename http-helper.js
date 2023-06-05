@@ -1,12 +1,16 @@
 const axios = require('axios');
+const { logger } = require('./logger.js')
 
 async function followLink(url, lastUrl = null) {
     try {
-        const response = await axios.get(url, {maxRedirects: 0});
+        let response = await axios.get(url, {maxRedirects: 0, timeout: 5000});
     } catch (error) {
         if (error.response && error.response.status === 302) {
-            const redirectUrl = error.response.headers.location;
+            let redirectUrl = error.response.headers.location;
             return await followLink(redirectUrl, url);
+        } else {
+            logger.error(`Unexpected Axios error when trying to follow a link: ${error} for ${url}`)
+            return url
         }
         return lastUrl;
     }
@@ -14,9 +18,9 @@ async function followLink(url, lastUrl = null) {
 }
 
 async function followLinks(urls) {
-    const finalUrls = [];
+    let finalUrls = [];
     for (let url of urls) {
-        const finalUrl = await followLink(url);
+        let finalUrl = await followLink(url);
         finalUrls.push(finalUrl);
     }
     return finalUrls;

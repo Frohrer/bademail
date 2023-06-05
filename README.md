@@ -18,6 +18,23 @@ The bot examines the email content, sender's details, and other relevant informa
 
 Bademail.io is currently in testing phase and is not 100% accurate. Always confirm with a third party if you are not sure. Do not use for commercial purposes, aka your company email. 
 
+## Using this repo
+
+### Requirements
+
+NodeJS v16 or higher
+OpenAI GPT-4 API access
+Bing API key
+SMTP service (Sendgrid, Mailgun)
+
+### Install
+
+```
+git clone https://github.com/Frohrer/bademail.git
+npm install
+npm start (port 25 will require elevated permissions)
+```
+
 ## Creator
 
-Bademail.io was created by Frederic Rohrer in 2023.
+Originally created by Fred Rohrer in 2020.

@@ -15,6 +15,7 @@ const emailSchema = new mongoose.Schema({
         lowercase: true,
     },
     messageId: String,
+    subject: String,
     header: Object,
     body: String,
     verdict: Object,
@@ -22,7 +23,7 @@ const emailSchema = new mongoose.Schema({
 },{ timestamps: true })
 
 // Add mongoose-encryption plugin to your schema
-emailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey });
+emailSchema.plugin(encrypt, { encryptionKey: encKey, signingKey: sigKey, excludeFromEncryption: ['processed'] });
 
 const visitorEmailSchema = new mongoose.Schema({
   email: {
@@ -52,24 +53,30 @@ const VisitorEmail = DB.model('VisitorEmail', visitorEmailSchema);
 const EmailStore = DB.model('bademail_verdicts', emailSchema, 'bademail_verdicts');
 
 const updateOrCreateVisitor = async (email) => {
-    try {
-      const filter = { email: email };
-      const update = { 
-        $inc: { visitCount: 1 },
-        $set: { lastVisit: new Date() },
-      };
-      const options = { 
-        new: true,
-        upsert: true, // Make this update into an upsert
-        setDefaultsOnInsert: true, // Apply schema defaults if new document is inserted
-      };
-      
-      const visitor = await VisitorEmail.findOneAndUpdate(filter, update, options);
-  
+  try {
+      let visitor = await VisitorEmail.findOne({ email: email });
+
+      if (visitor) {
+          // If the visitor exists, update the visitCount and lastVisit fields
+          visitor.visitCount += 1;
+          visitor.lastVisit = new Date();
+      } else {
+          // If the visitor does not exist, create a new document
+          visitor = new VisitorEmail({
+              email: email,
+              visitCount: 1,
+              firstVisit: new Date(),
+              lastVisit: new Date(),
+          });
+      }
+
+      // Save the changes
+      await visitor.save();
+
       logger.info('Visitor updated or inserted:', visitor);
-    } catch(err) {
+  } catch(err) {
       logger.error('Error updating or inserting visitor:', err);
-    }
+  }
 }
 
 const insertEmail = async (emailData) => {
@@ -110,7 +117,7 @@ const deleteEmail = async (id) => {
 }
 
 const getFailedEmails = async () => {
-  return EmailStore.find({processed: false})
+  return EmailStore.find({'processed': false})
   .then(emails => {
       if(emails.length === 0) {
           logger.info('No unprocessed emails found.');
@@ -122,10 +129,19 @@ const getFailedEmails = async () => {
   .catch(err => logger.error('Error finding unprocessed emails: ', err));
 }
 
+const getAllEmails = async () => {
+  return EmailStore.find({})
+  .then(emails => {
+      return emails;
+  })
+  .catch(err => logger.error('Error finding emails: ', err));
+}
+
 module.exports = {
     updateOrCreateVisitor,
     insertEmail,
     updateEmail,
     getFailedEmails,
-    deleteEmail
+    deleteEmail,
+    getAllEmails
 }

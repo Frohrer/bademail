@@ -5,6 +5,7 @@ const cheerio = require('cheerio');
 const parseUrl = require('parse-url');
 const { JSDOM } = require('jsdom');
 const { createWorker } = require('tesseract.js');
+const randomWords = require('random-words');
 const { followLink, followLinks } = require('./http-helper.js')
 const { processMaxTokens, processEmail} = require('./gpt-helper.js')
 const { logger } = require('./logger.js')
@@ -346,12 +347,15 @@ async function bingWebSearch(query, retries = 3) {
 async function handle_message(message,settings) {
   // Process the email message
   const html = message;
+  let message_unique_id = randomWords()
+  logger.info(`${message_unique_id} - Analysing message body\nLength:${html.length}`)
   let text = await extract_text_from_html(html);
   let links = extract_urls_from_html(html);
   // links = censor_urls(links);
   let ocr_text = ''
   let search = ''
   if (settings.ocr === true) {
+    logger.info(`${message_unique_id} - Performing OCR on images.`)
     try {
       ocr_text = await ocr_html_images(html, 'images');
     } catch (error) {
@@ -359,19 +363,30 @@ async function handle_message(message,settings) {
     }
   }
   if (settings.follow_links === true) {
-    links.urls = links.urls.slice(0,8)
+    logger.info(`${message_unique_id} - Following ${links.urls.length} URLs to determine final redirect destination.`)
     links.urls = await followLinks(links.urls)
+  }
+  if (settings.search_links === true) {
+    links.urls = links.urls.slice(0,settings.link_analysis_limit)
+    logger.info(`${message_unique_id} - Performing searches on ${links.urls.length} URLs.`)
     search = await bingWebSearchMultipleQueries(links.urls)
   }
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   text = await remove_consecutive_line_breaks(text);
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   text = await remove_before_forwarded(text);
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   text = await removeNonStandardChars(text);
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   text = await remove_consecutive_line_breaks(text);
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   let message_fields = await extract_email_fields(text);
   let message_field_search = await bingWebSearchMessageFields(message_fields)
   text = await removeTabAndNewline(text);
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   textobj = await processMaxTokens(text,4000,'extractTextGPT')
   text = textobj.message
+  logger.info(`${message_unique_id} - Cleaning text, now ${text.length} characters.`)
   let imageprompt = `The email contained no images with text.`
   if (ocr_text.length > 0) {
     imageprompt = `The email also contained images with this text:\n${ocr_text}`
@@ -380,8 +395,9 @@ async function handle_message(message,settings) {
     imageprompt = imageprompt.substring(0,1000)
     search = search.substring(0,5000)
     text = text.substring(0,20000)
-    logger.info(`Text longer than allowed, actually ${text.length} which is over 20000`)
+    logger.info(`${message_unique_id} - Text longer than allowed, actually ${text.length} which is over 20000`)
   }
+  logger.info(`${message_unique_id} - Processing with AI\nLength:${JSON.stringify({message_fields, message_field_search, text, imageprompt, search})}`)
   let result = await processEmail(message_fields, message_field_search, text, imageprompt, search);
   result.message = JSON.parse(result.message)
   result.cost += textobj.cost

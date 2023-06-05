@@ -1,7 +1,7 @@
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 require('dotenv').config();
 const SMTPServer = require("smtp-server").SMTPServer;
-const { updateOrCreateVisitor, insertEmail, updateEmail, getFailedEmails, deleteEmail } = require('./db.js');
+const { updateOrCreateVisitor, insertEmail, updateEmail, getFailedEmails, deleteEmail, getAllEmails } = require('./db.js');
 const simpleParser = require('mailparser').simpleParser;
 const { sendEmail, sendErrorEmail, forwardEmail } = require('./responder.js');
 const { handle_message } = require('./analysis.js')
@@ -33,7 +33,6 @@ function processRequest(email) {
         }
     });
 }
-
 
 function infoParser(envelope,data){
     return new Promise((resolve,reject) => {
@@ -133,7 +132,6 @@ function infoParser(envelope,data){
         if (data.spf && data.spf == 'pass') {
             info.valid_spf = true
         }
-        logger.info(info)
         resolve(info)
     })
 }
@@ -231,6 +229,7 @@ const smtpServerNodemailer = new SMTPServer({
                 let emailData = {
                     email:info.from,
                     messageId:info.messageId,
+                    subject:info.subject,
                     headers:mail.headers,
                     body:mail.html || mail.text,
                     verdict:{},
@@ -273,6 +272,7 @@ if (process.env.MODE === 'cicd') {
         email:'test@example.com',
         messageId:'test123-fakeid@example.com',
         headers:{},
+        subject:'Give me money please!',
         body:`---------- Forwarded message ---------
         From: Micheal Bloomberg <mbloomberg@example.com>
         Date: Fri, May 26, 2023 at 8:54 AM
@@ -306,7 +306,6 @@ if (process.env.MODE === 'cicd') {
             updateEmail(id,emailData)
             process.exit();
         })
-        
     })
 }
 
@@ -320,13 +319,22 @@ getFailedEmails().then((emails) => {
             let info = {
                 messageId:email.messageId,
                 from:email.email,
-                subject:email.headers.subject
+                subject:email.subject
             }
             sendEmail(response,info)
             deleteEmail(email._id)
         })
     }
 })
+
+// Grab emails stuck in the queue for troubleshooting.
+// getAllEmails().then((emails) => {
+//     for (let i = 0; i < emails.length; i++) {
+//         let email = emails[i];
+//         console.log(email.verdict)
+//         console.log('\n\n\n')
+//     }
+// })
 
 smtpServerNodemailer.listen(settings.smtp_port,'0.0.0.0');
 smtpServerNodemailer.on("error", err => {
